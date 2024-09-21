@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,21 +14,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TimerActivity extends AppCompatActivity {
 
     private TextView textViewName, textViewEmail, textViewTimer;
     private ImageView iconoGenero;
     private Button buttonStartReset;
-    private String nombre, apellido, correo, genero, id;
+    private String nombre, apellido, correo, genero;
+    private Integer id;
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 1500000;
-    private long restTimeInMillis = 300000; // 5 minutos de descanso en milisegundos
+    private long timeLeftInMillis = 5000;
+    private long restTimeInMillis =  12000;
     private ApiService apiService;
 
 
@@ -42,6 +48,7 @@ public class TimerActivity extends AppCompatActivity {
             return insets;
         });
 
+        apiService = RetrofitClient.getApiService();  // Asegúrate de tener esto en tu código
 
         textViewName = findViewById(R.id.nombre);
         textViewEmail = findViewById(R.id.correo);
@@ -53,7 +60,7 @@ public class TimerActivity extends AppCompatActivity {
         apellido = getIntent().getStringExtra("apellido");
         correo = getIntent().getStringExtra("correo");
         genero = getIntent().getStringExtra("genero");
-        id = getIntent().getStringExtra("id");
+        id = getIntent().getIntExtra("id", -1);
         textViewName.setText(nombre + ' ' + apellido);
         textViewEmail.setText(correo);
 
@@ -87,24 +94,54 @@ public class TimerActivity extends AppCompatActivity {
                 actualizarTextoTiempo();
             }
 
+
+
             @Override
             public void onFinish() {
                 isTimerRunning = false;
                 buttonStartReset.setText("Reiniciar");
 
-                // Mostrar el diálogo de descanso
-                new MaterialAlertDialogBuilder(TimerActivity.this)
-                        .setTitle("Tiempo de descanso")
-                        .setMessage("Debes dejar de trabajar y tomar un descanso ahora.")
-                        .setPositiveButton("Aceptar", (dialog, which) -> {
-                            // Iniciar el temporizador de descanso automáticamente
-                            iniciarTiempo();
-                            // Obtener las tareas del usuario
-                            revisarTareas();
-                        })
-                        .setCancelable(false)
-                        .show();
+                apiService.getUserTasks(id).enqueue(new Callback<TareaResponse>() {
+                    @Override
+                    public void onResponse(Call<TareaResponse> call, Response<TareaResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<Tarea> tareas = response.body().getTodos();
+                            System.out.println(tareas);
+                            System.out.println(tareas.get(0));
+                            System.out.println("Primera tarea: " + tareas.get(0).getTarea());// Obtener la lista de tareas desde el objeto "todos"
+
+                            if (!tareas.isEmpty()) {
+                                Intent intent = new Intent(TimerActivity.this, TareasActivity.class);
+                                intent.putParcelableArrayListExtra("tasks", new ArrayList<>(tareas));
+                                startActivity(intent);
+                                empezarTiempoDescanso();
+                                buttonStartReset.setVisibility(View.GONE);
+                            } else {
+                                new MaterialAlertDialogBuilder(TimerActivity.this)
+                                        .setTitle("¡Felicidades!")
+                                        .setMessage("Empezó el tiempo de descanso!")
+                                        .setPositiveButton("Entendido", (dialog, which) -> {
+                                            empezarTiempoDescanso();
+                                        })
+                                        .setCancelable(false)
+                                        .show();
+
+                                buttonStartReset.setVisibility(View.GONE);
+                            }
+                        } else {
+                            Log.e("TimerActivity", "Error al obtener las tareas");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<TareaResponse> call, Throwable t) {
+                        Log.e("TimerActivity", "Error al obtener las tareas: " + t.getMessage());
+                    }
+                });
             }
+
+
+
         }.start();
 
         isTimerRunning = true;
@@ -130,42 +167,31 @@ public class TimerActivity extends AppCompatActivity {
 
 
 
+    private void empezarTiempoDescanso() {
+        countDownTimer = new CountDownTimer(restTimeInMillis, 1000) {
 
-
-    private void revisarTareas() {
-        apiService.getUserTasks(userId).enqueue(new Callback<List<Todo>>() {
             @Override
-            public void onResponse(Call<List<Todo>> call, Response<List<Todo>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Todo> todos = response.body();
-                    if (todos.isEmpty()) {
-                        // Si no hay tareas, mostrar el diálogo indicando que empezó el tiempo de descanso
-                        showNoTasksDialog();
-                    } else {
-                        // Si hay tareas, redirigir a TareasActivity
-                        Intent intent = new Intent(TimerActivity.this, TareasActivity.class);
-                        intent.putParcelableArrayListExtra("tasks", new ArrayList<>(todos));
-                        startActivity(intent);
-                    }
-                }
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                actualizarTextoTiempo();
             }
 
             @Override
-            public void onFailure(Call<List<Todo>> call, Throwable t) {
-                Log.e("TimerActivity", "Error al obtener las tareas: " + t.getMessage());
+            public void onFinish() {
+                isTimerRunning = false;
+                buttonStartReset.setText("Reiniciar");
+                new MaterialAlertDialogBuilder(TimerActivity.this)
+                        .setTitle("Atención")
+                        .setMessage("Terminó el tiempo de descanso. Dale al botón de reinicio para iniciar otro ciclo.")
+                        .setPositiveButton("Entendido", (dialog, which) -> {
+                        })
+                        .setCancelable(false)
+                        .show();
+                buttonStartReset.setVisibility(View.VISIBLE);
+
             }
-        });
+        }.start();
     }
-
-    private void showNoTasksDialog() {
-        new MaterialAlertDialogBuilder(TimerActivity.this)
-                .setTitle("Tiempo de descanso")
-                .setMessage("No tienes tareas pendientes. El tiempo de descanso ha comenzado.")
-                .setPositiveButton("Aceptar", (dialog, which) -> dialog.dismiss())
-                .setCancelable(false)
-                .show();
-    }
-
 
 
 

@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("correo", loginResponse.getEmail());
                     intent.putExtra("apellido", loginResponse.getLastName());
                     intent.putExtra("genero", loginResponse.getGender());
-                    intent.putExtra("id", loginResponse.getId());
+                    Integer userId = loginResponse.getId();
+                    intent.putExtra("id", userId);
                     startActivity(intent);
 
 

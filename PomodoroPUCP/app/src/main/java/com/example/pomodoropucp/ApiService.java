@@ -13,5 +13,6 @@ public interface ApiService {
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
     @GET("todos/user/{userId}")
-    Call<List<Tarea>> getUserTasks(@Path("userId") int userId);
+    Call<TareaResponse> getUserTasks(@Path("userId") int userId);
+
 }
