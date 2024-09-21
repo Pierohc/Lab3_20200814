@@ -15,30 +15,27 @@
         android:padding="24dp"
         >
 
-        <!-- Campo de Usuario -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Usuario">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/username"
+                android:id="@+id/user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Espacio entre los campos -->
         <Space
             android:layout_width="match_parent"
             android:layout_height="16dp"/>
 
-        <!-- Campo de Contraseña -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Contraseña"
-            app:endIconMode="password_toggle">
+            >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/password"
@@ -47,18 +44,15 @@
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Espacio entre el campo de contraseña y el botón -->
         <Space
             android:layout_width="match_parent"
             android:layout_height="32dp"/>
 
-        <!-- Botón de Iniciar Sesión -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/login_button"
+        <Button
+            android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Iniciar Sesión"
-            android:textAllCaps="false"
             android:textColor="@android:color/white"
             app:cornerRadius="24dp"/>
 
