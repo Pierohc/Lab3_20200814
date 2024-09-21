@@ -2,9 +2,12 @@ package com.example.pomodoropucp;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +20,7 @@ import java.util.ArrayList;
 public class TareasActivity extends AppCompatActivity {
 
 
-    private Spinner listViewTasks;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +34,8 @@ public class TareasActivity extends AppCompatActivity {
         });
 
 
-
-        listViewTasks = findViewById(R.id.listViewTasks);
+        spinner = findViewById(R.id.spinner);
+        Button botonCambiarEstado = findViewById(R.id.cambiarEstado);
 
         ArrayList<Tarea> tareas = getIntent().getParcelableArrayListExtra("tasks");
         ArrayList<String> tasksList = new ArrayList<>();
@@ -55,7 +58,34 @@ public class TareasActivity extends AppCompatActivity {
                 tasksList
         );
 
-        listViewTasks.setAdapter(adapter);
+        spinner.setAdapter(adapter);
+
+
+        botonCambiarEstado.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String seleccion = spinner.getSelectedItem().toString();
+                System.out.println(seleccion);
+                String[] separador = seleccion.split("- ");
+                String nuevaOpcion = "Nueva Opción";
+
+                if(separador[1].equals("Completado")){
+                    nuevaOpcion = separador[0]+"- "+"No completado";
+                }else{
+                    nuevaOpcion = separador[0]+"- "+"Completado";
+                }
+
+                int posicionSeleccionada = spinner.getSelectedItemPosition();
+                tasksList.set(posicionSeleccionada, nuevaOpcion);
+                adapter.notifyDataSetChanged();
+                spinner.setSelection(posicionSeleccionada);
+                Toast.makeText(TareasActivity.this, "Cambio de estado realizado", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
 
     }
 }

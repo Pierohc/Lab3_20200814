@@ -32,9 +32,10 @@ public class TimerActivity extends AppCompatActivity {
     private Integer id;
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 5000;
-    private long restTimeInMillis =  12000;
+    private long timeLeftInMillis = 1500000;
+    private long restTimeInMillis =  300000;
     private ApiService apiService;
+
 
 
     @Override
@@ -77,11 +78,22 @@ public class TimerActivity extends AppCompatActivity {
 
         buttonStartReset.setOnClickListener(v -> {
             if (isTimerRunning) {
+                System.out.println("Aqui 1");
                 reiniciarTiempo();
             } else {
-                iniciarTiempo();
+                System.out.println("Aqui 2");
+
+                if (timeLeftInMillis == 1500000) {
+                    iniciarTiempo();
+                } else {
+                    timeLeftInMillis = 1500000;
+                    actualizarTextoTiempo();
+                    buttonStartReset.setText("Iniciar");
+                    isTimerRunning = false;
+                }
             }
         });
+
 
     }
 
@@ -106,15 +118,13 @@ public class TimerActivity extends AppCompatActivity {
                     public void onResponse(Call<TareaResponse> call, Response<TareaResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             List<Tarea> tareas = response.body().getTodos();
-                            System.out.println(tareas);
-                            System.out.println(tareas.get(0));
-                            System.out.println("Primera tarea: " + tareas.get(0).getTarea());// Obtener la lista de tareas desde el objeto "todos"
 
                             if (!tareas.isEmpty()) {
                                 Intent intent = new Intent(TimerActivity.this, TareasActivity.class);
                                 intent.putParcelableArrayListExtra("tasks", new ArrayList<>(tareas));
                                 startActivity(intent);
                                 empezarTiempoDescanso();
+                                buttonStartReset.setText("Reiniciar");
                                 buttonStartReset.setVisibility(View.GONE);
                             } else {
                                 new MaterialAlertDialogBuilder(TimerActivity.this)
@@ -139,8 +149,6 @@ public class TimerActivity extends AppCompatActivity {
                     }
                 });
             }
-
-
 
         }.start();
 
@@ -180,18 +188,20 @@ public class TimerActivity extends AppCompatActivity {
             public void onFinish() {
                 isTimerRunning = false;
                 buttonStartReset.setText("Reiniciar");
+
                 new MaterialAlertDialogBuilder(TimerActivity.this)
                         .setTitle("Atención")
                         .setMessage("Terminó el tiempo de descanso. Dale al botón de reinicio para iniciar otro ciclo.")
                         .setPositiveButton("Entendido", (dialog, which) -> {
+                            buttonStartReset.setVisibility(View.VISIBLE);
+                            buttonStartReset.setText("Reiniciar");
                         })
                         .setCancelable(false)
                         .show();
-                buttonStartReset.setVisibility(View.VISIBLE);
-
             }
         }.start();
     }
+
 
 
 
