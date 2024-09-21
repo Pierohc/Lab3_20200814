@@ -37,8 +37,10 @@ public class TimerActivity extends AppCompatActivity {
     private Integer id;
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 1500000;
-    private long restTimeInMillis =  300000;
+    private long timeLeftInMillis = 5000;
+    private long restTimeInMillis =  7000;
+    //private long timeLeftInMillis = 1500000;
+    //private long restTimeInMillis =  300000;
     private ApiService apiService;
 
 
@@ -92,10 +94,10 @@ public class TimerActivity extends AppCompatActivity {
             if (isTimerRunning) {
                 reiniciarTiempo();
             } else {
-                if (timeLeftInMillis == 1500000) {
+                if (timeLeftInMillis == 5000) {
                     iniciarTiempo();
                 } else {
-                    timeLeftInMillis = 1500000;
+                    timeLeftInMillis = 5000;
                     actualizarTextoTiempo();
                     estado.setText("Descanso: 05:00");
                     botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.play));
@@ -152,21 +154,33 @@ public class TimerActivity extends AppCompatActivity {
                         if (response.isSuccessful() && response.body() != null) {
                             List<Tarea> tareas = response.body().getTodos();
 
+
+
+
                             if (!tareas.isEmpty()) {
-                                Intent intent = new Intent(TimerActivity.this, TareasActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                intent.putParcelableArrayListExtra("tasks", new ArrayList<>(tareas));
-                                startActivity(intent);
+
                                 estado.setText("En descanso");
                                 empezarTiempoDescanso();
                                 botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
                                 botonStartRestart.setVisibility(View.GONE);
+                                new MaterialAlertDialogBuilder(TimerActivity.this)
+                                        .setTitle("¡Felicidades!")
+                                        .setMessage("Empezó el tiempo de descanso! Ya debes dejar de trabajar, es momento de descansar.")
+                                        .setPositiveButton("Entendido", (dialog, which) -> {
+                                            Intent intent = new Intent(TimerActivity.this, TareasActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                            intent.putParcelableArrayListExtra("tasks", new ArrayList<>(tareas));
+                                            startActivity(intent);
+                                        })
+                                        .setCancelable(false)
+                                        .show();
+
                             } else {
                                 estado.setText("En descanso");
                                 new MaterialAlertDialogBuilder(TimerActivity.this)
                                         .setTitle("¡Felicidades!")
                                         .setMessage("Empezó el tiempo de descanso!")
-                                        .setPositiveButton("Entendido", (dialog, which) -> {
+                                        .setPositiveButton("Entendido", (dialoga, whichw) -> {
                                             empezarTiempoDescanso();
                                         })
                                         .setCancelable(false)
@@ -174,6 +188,8 @@ public class TimerActivity extends AppCompatActivity {
 
                                 botonStartRestart.setVisibility(View.GONE);
                             }
+
+
                         } else {
                             Log.e("TimerActivity", "Error al obtener las tareas");
                         }
@@ -196,7 +212,7 @@ public class TimerActivity extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        timeLeftInMillis = 1500000;
+        timeLeftInMillis = 5000;
         actualizarTextoTiempo();
         botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.play));
         isTimerRunning = false;
