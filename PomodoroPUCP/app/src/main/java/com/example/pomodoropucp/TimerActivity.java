@@ -89,10 +89,10 @@ public class TimerActivity extends AppCompatActivity {
             } else {
                 System.out.println("Aqui 2");
 
-                if (timeLeftInMillis == 1500000) {
+                if (timeLeftInMillis == 5000) {
                     iniciarTiempo();
                 } else {
-                    timeLeftInMillis = 1500000;
+                    timeLeftInMillis = 5000;
                     actualizarTextoTiempo();
                     botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
                     isTimerRunning = false;
@@ -166,7 +166,7 @@ public class TimerActivity extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        timeLeftInMillis = 1500000;
+        timeLeftInMillis = 5000;
         actualizarTextoTiempo();
         botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.play));
         isTimerRunning = false;
