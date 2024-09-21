@@ -37,10 +37,8 @@ public class TimerActivity extends AppCompatActivity {
     private Integer id;
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 5000;
-    private long restTimeInMillis =  7000;
-    //private long timeLeftInMillis = 1500000;
-    //private long restTimeInMillis =  300000;
+    private long timeLeftInMillis = 1500000;
+    private long restTimeInMillis =  300000;
     private ApiService apiService;
 
 
@@ -94,10 +92,10 @@ public class TimerActivity extends AppCompatActivity {
             if (isTimerRunning) {
                 reiniciarTiempo();
             } else {
-                if (timeLeftInMillis == 5000) {
+                if (timeLeftInMillis == 1500000) {
                     iniciarTiempo();
                 } else {
-                    timeLeftInMillis = 5000;
+                    timeLeftInMillis = 1500000;
                     actualizarTextoTiempo();
                     estado.setText("Descanso: 05:00");
                     botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.play));
@@ -154,9 +152,6 @@ public class TimerActivity extends AppCompatActivity {
                         if (response.isSuccessful() && response.body() != null) {
                             List<Tarea> tareas = response.body().getTodos();
 
-
-
-
                             if (!tareas.isEmpty()) {
 
                                 estado.setText("En descanso");
@@ -212,7 +207,7 @@ public class TimerActivity extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        timeLeftInMillis = 5000;
+        timeLeftInMillis = 1500000;
         actualizarTextoTiempo();
         botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.play));
         isTimerRunning = false;
