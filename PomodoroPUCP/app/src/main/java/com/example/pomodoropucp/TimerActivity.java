@@ -29,7 +29,6 @@ public class TimerActivity extends AppCompatActivity {
 
     private TextView textViewName, textViewEmail, textViewTimer;
     private ImageView iconoGenero;
-    private Button buttonStartReset;
     private ImageButton botonStartRestart;
     private String nombre, apellido, correo, genero;
     private Integer id;
@@ -59,7 +58,6 @@ public class TimerActivity extends AppCompatActivity {
         textViewName = findViewById(R.id.nombre);
         textViewEmail = findViewById(R.id.correo);
         textViewTimer = findViewById(R.id.tiempoTxt);
-        buttonStartReset = findViewById(R.id.botonIniciarReiniciar);
         botonStartRestart = findViewById(R.id.botonPlayRestart);
         iconoGenero = findViewById(R.id.iconoGenero);
 
