@@ -1,11 +1,13 @@
 package com.example.pomodoropucp;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,12 +30,15 @@ public class TimerActivity extends AppCompatActivity {
     private TextView textViewName, textViewEmail, textViewTimer;
     private ImageView iconoGenero;
     private Button buttonStartReset;
+    private ImageButton botonStartRestart;
     private String nombre, apellido, correo, genero;
     private Integer id;
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 1500000;
-    private long restTimeInMillis =  300000;
+    //private long timeLeftInMillis = 1500000;
+    //private long restTimeInMillis =  300000;
+    private long timeLeftInMillis = 5000;
+    private long restTimeInMillis =  7000;
     private ApiService apiService;
 
 
@@ -55,6 +60,7 @@ public class TimerActivity extends AppCompatActivity {
         textViewEmail = findViewById(R.id.correo);
         textViewTimer = findViewById(R.id.tiempoTxt);
         buttonStartReset = findViewById(R.id.botonIniciarReiniciar);
+        botonStartRestart = findViewById(R.id.botonPlayRestart);
         iconoGenero = findViewById(R.id.iconoGenero);
 
         nombre = getIntent().getStringExtra("nombre");
@@ -76,7 +82,7 @@ public class TimerActivity extends AppCompatActivity {
 
         actualizarTextoTiempo();
 
-        buttonStartReset.setOnClickListener(v -> {
+        botonStartRestart.setOnClickListener(v -> {
             if (isTimerRunning) {
                 System.out.println("Aqui 1");
                 reiniciarTiempo();
@@ -88,7 +94,7 @@ public class TimerActivity extends AppCompatActivity {
                 } else {
                     timeLeftInMillis = 1500000;
                     actualizarTextoTiempo();
-                    buttonStartReset.setText("Iniciar");
+                    botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
                     isTimerRunning = false;
                 }
             }
@@ -111,7 +117,7 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 isTimerRunning = false;
-                buttonStartReset.setText("Reiniciar");
+                botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
 
                 apiService.getUserTasks(id).enqueue(new Callback<TareaResponse>() {
                     @Override
@@ -124,8 +130,8 @@ public class TimerActivity extends AppCompatActivity {
                                 intent.putParcelableArrayListExtra("tasks", new ArrayList<>(tareas));
                                 startActivity(intent);
                                 empezarTiempoDescanso();
-                                buttonStartReset.setText("Reiniciar");
-                                buttonStartReset.setVisibility(View.GONE);
+                                botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
+                                botonStartRestart.setVisibility(View.GONE);
                             } else {
                                 new MaterialAlertDialogBuilder(TimerActivity.this)
                                         .setTitle("¡Felicidades!")
@@ -136,7 +142,7 @@ public class TimerActivity extends AppCompatActivity {
                                         .setCancelable(false)
                                         .show();
 
-                                buttonStartReset.setVisibility(View.GONE);
+                                botonStartRestart.setVisibility(View.GONE);
                             }
                         } else {
                             Log.e("TimerActivity", "Error al obtener las tareas");
@@ -153,7 +159,7 @@ public class TimerActivity extends AppCompatActivity {
         }.start();
 
         isTimerRunning = true;
-        buttonStartReset.setText("Reiniciar");
+        botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
     }
 
     private void reiniciarTiempo() {
@@ -162,7 +168,7 @@ public class TimerActivity extends AppCompatActivity {
         }
         timeLeftInMillis = 1500000;
         actualizarTextoTiempo();
-        buttonStartReset.setText("Iniciar");
+        botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.play));
         isTimerRunning = false;
     }
 
@@ -187,14 +193,14 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 isTimerRunning = false;
-                buttonStartReset.setText("Reiniciar");
+                botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
 
                 new MaterialAlertDialogBuilder(TimerActivity.this)
                         .setTitle("Atención")
                         .setMessage("Terminó el tiempo de descanso. Dale al botón de reinicio para iniciar otro ciclo.")
                         .setPositiveButton("Entendido", (dialog, which) -> {
-                            buttonStartReset.setVisibility(View.VISIBLE);
-                            buttonStartReset.setText("Reiniciar");
+                            botonStartRestart.setVisibility(View.VISIBLE);
+                            botonStartRestart.setImageDrawable(getResources().getDrawable(R.drawable.restart));
                         })
                         .setCancelable(false)
                         .show();
